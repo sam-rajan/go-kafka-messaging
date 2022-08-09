@@ -10,7 +10,7 @@ import (
 )
 
 type KafkaProperties struct {
-	value kafka.ConfigMap
+	Value kafka.ConfigMap
 }
 
 func (self *KafkaProperties) LoadProperties(configFileName string) {
@@ -22,7 +22,7 @@ func (self *KafkaProperties) LoadProperties(configFileName string) {
 	}
 
 	scanner := bufio.NewScanner(configFile)
-	self.value = make(map[string]kafka.ConfigValue)
+	self.Value = make(map[string]kafka.ConfigValue)
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -32,7 +32,7 @@ func (self *KafkaProperties) LoadProperties(configFileName string) {
 			parameter := strings.TrimSpace(keyval[0])
 			value := strings.TrimSpace(keyval[1])
 
-			self.value[parameter] = value
+			self.Value[parameter] = value
 		}
 
 		if err := scanner.Err(); err != nil {
