@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -11,7 +12,7 @@ import (
 type KafkaProducer struct {
 }
 
-func (self *KafkaProducer) Produce(config kafka.ConfigMap) {
+func (self *KafkaProducer) Produce(config kafka.ConfigMap, wg *sync.WaitGroup) {
 
 	topic := "first_topic"
 	producer, err := kafka.NewProducer(&config)
@@ -21,8 +22,8 @@ func (self *KafkaProducer) Produce(config kafka.ConfigMap) {
 		os.Exit(1)
 	}
 
-	go func() {
-
+	go func(producer *kafka.Producer, wg *sync.WaitGroup) {
+		wg.Add(1)
 		for event := range producer.Events() {
 			switch ev := event.(type) {
 			case *kafka.Message:
@@ -34,10 +35,11 @@ func (self *KafkaProducer) Produce(config kafka.ConfigMap) {
 				}
 			}
 		}
-	}()
+		wg.Done()
+	}(producer, wg)
 
-	go func() {
-
+	go func(producer *kafka.Producer, wg *sync.WaitGroup) {
+		wg.Add(1)
 		for {
 			producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
@@ -47,7 +49,7 @@ func (self *KafkaProducer) Produce(config kafka.ConfigMap) {
 
 			time.Sleep(10 * time.Second)
 		}
-
-	}()
+		wg.Done()
+	}(producer, wg)
 
 }

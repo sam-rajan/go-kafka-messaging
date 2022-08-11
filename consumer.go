@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -11,7 +12,7 @@ import (
 type KafkaConsumer struct {
 }
 
-func (self *KafkaConsumer) Consume(config kafka.ConfigMap) {
+func (self *KafkaConsumer) Consume(config kafka.ConfigMap, wg *sync.WaitGroup) {
 
 	config["group.id"] = "first-consumer"
 	config["auto.offset.reset"] = "earliest"
@@ -31,13 +32,18 @@ func (self *KafkaConsumer) Consume(config kafka.ConfigMap) {
 		os.Exit(1)
 	}
 
-	for {
-		event, err := consumer.ReadMessage(10 * time.Second)
+	go func(consumer *kafka.Consumer, wg *sync.WaitGroup) {
+		wg.Add(1)
+		for {
+			event, err := consumer.ReadMessage(10 * time.Second)
 
-		if err != nil {
-			continue
+			if err != nil {
+				continue
+			}
+
+			fmt.Printf("Key = %s , Value = %s", string(event.Key), string(event.Value))
 		}
+		wg.Done()
+	}(consumer, wg)
 
-		fmt.Printf("Key = %s , Value = %s", string(event.Key), string(event.Value))
-	}
 }
