@@ -12,7 +12,7 @@ import (
 type KafkaConsumer struct {
 }
 
-func (self *KafkaConsumer) Consume(config kafka.ConfigMap, wg *sync.WaitGroup) {
+func (self *KafkaConsumer) Consume(config kafka.ConfigMap, wg *sync.WaitGroup, channel chan<- kafka.Message) {
 
 	config["group.id"] = "first-consumer"
 	config["auto.offset.reset"] = "earliest"
@@ -34,6 +34,7 @@ func (self *KafkaConsumer) Consume(config kafka.ConfigMap, wg *sync.WaitGroup) {
 
 	go func(consumer *kafka.Consumer, wg *sync.WaitGroup) {
 		wg.Add(1)
+		fmt.Println("Consumer Started")
 		for {
 			event, err := consumer.ReadMessage(10 * time.Second)
 
@@ -41,7 +42,8 @@ func (self *KafkaConsumer) Consume(config kafka.ConfigMap, wg *sync.WaitGroup) {
 				continue
 			}
 
-			fmt.Printf("Key = %s , Value = %s", string(event.Key), string(event.Value))
+			channel <- *event
+
 		}
 		wg.Done()
 	}(consumer, wg)
