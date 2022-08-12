@@ -23,6 +23,7 @@ func (self *KafkaProducer) Produce(config kafka.ConfigMap, wg *sync.WaitGroup) {
 	}
 
 	go func(producer *kafka.Producer, wg *sync.WaitGroup) {
+		fmt.Println("Producer Callback started")
 		wg.Add(1)
 		for event := range producer.Events() {
 			switch ev := event.(type) {
@@ -39,6 +40,7 @@ func (self *KafkaProducer) Produce(config kafka.ConfigMap, wg *sync.WaitGroup) {
 	}(producer, wg)
 
 	go func(producer *kafka.Producer, wg *sync.WaitGroup) {
+		fmt.Println("Producer Started")
 		wg.Add(1)
 		for {
 			producer.Produce(&kafka.Message{
