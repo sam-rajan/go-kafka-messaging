@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	configFile := "kafka-producer.properties"
+	configFile := "configs/kafka-producer.properties"
 	kafkaProperties := configreader.KafkaProperties{}
 	kafkaProperties.LoadProperties(configFile)
 

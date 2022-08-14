@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	configFile := "kafka-consumer.properties"
+	configFile := "configs/kafka-consumer.properties"
 	kafkaProperties := configreader.KafkaProperties{}
 	kafkaProperties.LoadProperties(configFile)
 
