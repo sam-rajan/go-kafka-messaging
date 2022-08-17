@@ -2,28 +2,37 @@ package receiver
 
 import (
 	"fmt"
+	"go-kafka-messaging/internal/app/receiver/client"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 type MessageReceiver struct {
-	KafkaConsumer *kafka.Consumer
+	kafkaClient *client.KafkaClient
 }
 
-func (self *MessageReceiver) StartReceive(topic string, wg *sync.WaitGroup, channel chan<- kafka.Message) {
+func NewMessageReceiver(client *client.KafkaClient) *MessageReceiver {
+	return &MessageReceiver{kafkaClient: client}
+}
 
-	err := self.KafkaConsumer.SubscribeTopics([]string{topic}, nil)
+func (self *MessageReceiver) StartReceive(topic string, channel chan<- kafka.Message) {
+
+	consumer := self.kafkaClient.Get()
+
+	if nil == consumer {
+		panic("Client cannot be null")
+	}
+
+	err := consumer.SubscribeTopics([]string{topic}, nil)
 
 	if err != nil {
 		fmt.Printf("Failed to subscribt topic: %s\n", err)
 		os.Exit(1)
 	}
 
-	go func(consumer *kafka.Consumer, wg *sync.WaitGroup, channel chan<- kafka.Message) {
-		wg.Add(1)
+	go func(consumer *kafka.Consumer, channel chan<- kafka.Message) {
 		fmt.Println("Consumer Started")
 		for {
 			event, err := consumer.ReadMessage(10 * time.Second)
@@ -35,6 +44,6 @@ func (self *MessageReceiver) StartReceive(topic string, wg *sync.WaitGroup, chan
 			channel <- *event
 
 		}
-	}(self.KafkaConsumer, wg, channel)
+	}(consumer, channel)
 
 }

@@ -20,11 +20,16 @@ func main() {
 		key := "key-" + strconv.Itoa(i)
 		value := scanner.Text()
 
+		if value == "" {
+			continue
+		}
+
 		message := kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 			Key:            []byte(key),
 			Value:          []byte(value),
 		}
 		messageSender.Send(message)
+		i = i + 1
 	}
 }

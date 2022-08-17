@@ -17,7 +17,7 @@ func (self *KafkaProperties) LoadProperties(configFileName string) {
 	configFile, err := os.Open(configFileName)
 
 	if err != nil {
-		fmt.Printf("Failed to read config file")
+		fmt.Printf("Failed to read config file %s", err)
 		os.Exit(1)
 	}
 
