@@ -9,8 +9,9 @@ then
     go run cmd/sender-app/main.go
 elif [[ $APP == "RECEIVER" ]]
 then
+    CONSUMERS=$2
     echo "Starting receiver application"
-    go run cmd/receiver-app/main.go
+    go run cmd/receiver-app/main.go $CONSUMERS
 else 
     echo "Invalid Option"
 fi
