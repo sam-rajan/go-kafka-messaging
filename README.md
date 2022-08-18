@@ -25,10 +25,16 @@ A sample GoLang Application demonstrating usage with Kafka.
 
 You can run sender/receiver application by following command,
 
+For starting sender application.
+
 ```bash
-$ ./scripts/run.sh <RECEIVER/SENDER>
+$ ./scripts/run.sh SENDER
 ```
 
+For starting receiver application
+  
+```bash
+$ ./scripts/run.sh RECEIVER <CONSUMER_THREAD_COUNT>
+```
 
-   
 
