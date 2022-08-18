@@ -27,6 +27,11 @@ func main() {
 	kafkaProperties := configreader.KafkaProperties{}
 	kafkaProperties.LoadProperties(configFile)
 
+	adminClient, _ := kafka.NewAdminClient(&kafkaProperties.Value)
+	metadata, err := adminClient.GetMetadata(nil, true, 100000)
+	if err == nil {
+		fmt.Println(metadata.Topics)
+	}
 	for i := 0; i < numberOfConsumers; i++ {
 		channel := make(chan kafka.Message, 5)
 
