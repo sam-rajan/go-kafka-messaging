@@ -5,6 +5,7 @@ import (
 	"go-kafka-messaging/cmd/receiver-app/app"
 	receiver "go-kafka-messaging/internal/app/receiver"
 	configreader "go-kafka-messaging/internal/pkg/config-reader"
+	topicmanager "go-kafka-messaging/internal/pkg/topic-manager"
 	"os"
 	"strconv"
 	"sync"
@@ -27,11 +28,14 @@ func main() {
 	kafkaProperties := configreader.KafkaProperties{}
 	kafkaProperties.LoadProperties(configFile)
 
-	adminClient, _ := kafka.NewAdminClient(&kafkaProperties.Value)
-	metadata, err := adminClient.GetMetadata(nil, true, 100000)
+	topicFetcher, err := topicmanager.NewTopicClient(kafkaProperties)
+
 	if err == nil {
-		fmt.Println(metadata.Topics)
+		for _, topic := range topicFetcher.FetchTopics() {
+			fmt.Println(topic)
+		}
 	}
+
 	for i := 0; i < numberOfConsumers; i++ {
 		channel := make(chan kafka.Message, 5)
 
