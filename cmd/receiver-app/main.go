@@ -28,25 +28,28 @@ func main() {
 	kafkaProperties := configreader.KafkaProperties{}
 	kafkaProperties.LoadProperties(configFile)
 
-	topicFetcher, err := topicmanager.NewTopicClient(kafkaProperties)
+	topicCreator, err := topicmanager.NewTopicClient[topicmanager.TopicCreator](kafkaProperties)
 
-	if err == nil {
-		for _, topic := range topicFetcher.FetchTopics() {
-			fmt.Println(topic)
-		}
+	if err != nil {
+		fmt.Println("Failed To Create Topic Creator instance")
 	}
 
 	for i := 0; i < numberOfConsumers; i++ {
 		channel := make(chan kafka.Message, 5)
 
-		groupId := "Group-" + strconv.Itoa(i)
+		groupId := "Receiver-" + strconv.Itoa(i)
+		_, err = topicCreator.CreateTopic(groupId)
+
+		if err != nil {
+			fmt.Printf("Faile to create Topic : %s , Reason: %s\n", groupId, err)
+		}
+
 		kafkaProperties.Value.Set("group.id=" + groupId)
 
 		messageReceiver := app.Init(kafkaProperties)
-		topic := "first_topic"
 		processor := receiver.KafkaProcessor{}
 		processor.Process(channel)
-		messageReceiver.StartReceive(topic, channel)
+		messageReceiver.StartReceive(groupId, channel)
 	}
 
 	wg.Wait()
