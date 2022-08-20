@@ -1,25 +1,15 @@
 package topicmanager
 
 import (
+	"context"
+	"errors"
 	"fmt"
-	configreader "go-kafka-messaging/internal/pkg/config-reader"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 type TopicClient struct {
 	adminClient *kafka.AdminClient
-}
-
-func NewTopicClient(properties configreader.KafkaProperties) (*TopicClient, error) {
-	delete(properties.Value, "auto.offset.reset")
-	client, err := kafka.NewAdminClient(&properties.Value)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &TopicClient{adminClient: client}, nil
 }
 
 func (self TopicClient) FetchTopics() []string {
@@ -37,4 +27,29 @@ func (self TopicClient) FetchTopics() []string {
 
 	return topics
 
+}
+
+func (self TopicClient) CreateTopic(topicName string) (string, error) {
+	existingTopics := self.FetchTopics()
+
+	for _, topic := range existingTopics {
+		if topic == topicName {
+			return topic, nil
+		}
+	}
+
+	topicSpec := kafka.TopicSpecification{Topic: topicName, NumPartitions: 2}
+	topicSpecArr := []kafka.TopicSpecification{topicSpec}
+
+	topicResult, err := self.adminClient.CreateTopics(context.TODO(), topicSpecArr)
+
+	if err != nil {
+		return "", err
+	}
+
+	if topicResult[0].Error.Code() != kafka.ErrNoError {
+		return "", errors.New(topicResult[0].Error.Code().String())
+	}
+
+	return topicResult[0].Topic, nil
 }
