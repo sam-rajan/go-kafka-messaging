@@ -2,34 +2,42 @@ package main
 
 import (
 	"bufio"
-	"go-kafka-messaging/cmd/sender-app/app"
+	"fmt"
+	inputparser "go-kafka-messaging/internal/app/sender/input-parser"
 	"os"
-	"strconv"
-
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 func main() {
 
-	messageSender := app.Init()
+	// messageSender := app.Init()
 
-	topic := "first_topic"
+	// topic := "first_topic"
 	scanner := bufio.NewScanner(os.Stdin)
 	var i int = 0
 	for scanner.Scan() {
-		key := "key-" + strconv.Itoa(i)
+
 		value := scanner.Text()
 
 		if value == "" {
 			continue
 		}
 
-		message := kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-			Key:            []byte(key),
-			Value:          []byte(value),
+		//key := "key-" + strconv.Itoa(i)
+
+		message, err := inputparser.ParseMessage(value)
+		if err != nil {
+			fmt.Printf("Input Parsing failed. Reason : %s\n", err.Error())
+			continue
 		}
-		messageSender.Send(message)
+
+		fmt.Println(message.GetMessage())
+		fmt.Println(message.GetTopic())
+		// message := kafka.Message{
+		// 	TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+		// 	Key:            []byte(key),
+		// 	Value:          []byte(value),
+		// }
+		// messageSender.Send(message)
 		i = i + 1
 	}
 }
