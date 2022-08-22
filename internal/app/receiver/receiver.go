@@ -25,7 +25,8 @@ func (self *MessageReceiver) StartReceive(topic string, channel chan<- kafka.Mes
 		panic("Client cannot be null")
 	}
 
-	err := consumer.SubscribeTopics([]string{topic}, nil)
+	broadcastTopic := "all"
+	err := consumer.SubscribeTopics([]string{topic, broadcastTopic}, nil)
 
 	if err != nil {
 		fmt.Printf("Failed to subscribt topic: %s\n", err)

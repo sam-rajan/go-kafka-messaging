@@ -31,9 +31,9 @@ func (self *KafkaClient) Init(config *configreader.KafkaProperties) {
 			switch ev := event.(type) {
 			case *kafka.Message:
 				if ev.TopicPartition.Error != nil {
-					fmt.Printf("Failed to deliver message: %v\n", ev.TopicPartition)
+					fmt.Printf("Failed to deliver message: Consumer Not Exist %s\n", *ev.TopicPartition.Topic)
 				} else {
-					fmt.Printf("Produced event to topic %s: key = %-10s value = %s\n",
+					fmt.Printf("Produced event to topic %s: key = %s value = %s\n",
 						*ev.TopicPartition.Topic, string(ev.Key), string(ev.Value))
 				}
 			}
