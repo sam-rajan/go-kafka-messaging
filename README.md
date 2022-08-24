@@ -17,7 +17,7 @@ A Sample GoLang application for learning purposes, understanding GoLang syntax a
   * Targeted message: "@receiver1: targeted test message", so only receiver1 would receive the message and print out.
   * If message format is invalid, the application should print out "invalid message"
   * If no receiver can be found, then application should print out "no receiver found for @receiverX".
-  * When receiver receives message, it should print out messages to the console.
+  * When receiver receives message, it should print messages to the console.
   * If user type in console "@receiver1#history" then application should print all received messages in the format mentioned before.
 * If user type in console "exit" then application should stop and print a summary of amount of messages received per each receiver.
 
