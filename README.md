@@ -20,6 +20,7 @@ A Sample GoLang application for learning purposes, understanding GoLang syntax a
   * When receiver receives message, it should print messages to the console.
   * If user type in console "@receiver1#history" then application should print all received messages in the format mentioned before.
 * If user type in console "exit" then application should stop and print a summary of amount of messages received per each receiver.
+* Commands can be executed either by producer itself or it can send to other consumers. For example, @receiver1#exit will send the exit command to receiver1
 
 ### How to Run the applications
 
