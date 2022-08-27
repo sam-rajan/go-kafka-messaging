@@ -5,32 +5,65 @@ import (
 	"strings"
 )
 
+type Action string
+
 type Message struct {
 	topic   string
-	message string
+	payload *Payload
+}
+
+type Payload struct {
+	Action  Action
+	Message string
 }
 
 func (self *Message) GetTopic() string {
 	return self.topic
 }
 
-func (self *Message) GetMessage() string {
-	return self.message
+func (self *Message) GetPayload() *Payload {
+	return self.payload
 }
 
 func ParseMessage(input string) (*Message, error) {
-	if string(input[0]) != "@" {
-		return new(Message), errors.New("Expecting a recepient reference")
+
+	receiver, err := "", error(nil)
+	if string(input[0]) == "@" {
+		receiver, input, err = parseReceiver(input)
 	}
 
-	receiverEnd := strings.Index(input, ":")
-
-	if receiverEnd <= 1 {
-		return new(Message), errors.New("Invalid Receiver reference")
+	if err != nil {
+		return new(Message), errors.New(err.Error())
 	}
 
-	receiverName := input[1:receiverEnd]
-	parsedMessage := input[receiverEnd+1:]
+	data := &Payload{}
+	if isAction(input) {
+		data.Action = Action(input)
+	} else {
+		data.Message = input
+	}
 
-	return &Message{topic: receiverName, message: strings.Trim(parsedMessage, " ")}, nil
+	return &Message{topic: receiver, payload: data}, nil
+}
+
+func parseReceiver(input string) (string, string, error) {
+	receiverEnd := strings.Index(input, " ")
+
+	if receiverEnd == -1 {
+		return "", input, errors.New("Expecting a recepient reference")
+	}
+
+	return input[1:receiverEnd], input[receiverEnd+1:], nil
+}
+
+func isAction(input string) bool {
+
+	actionList := []string{"EXIT", "HISTORY"}
+	for _, v := range actionList {
+		if v == strings.ToUpper(input) {
+			return true
+		}
+	}
+
+	return false
 }

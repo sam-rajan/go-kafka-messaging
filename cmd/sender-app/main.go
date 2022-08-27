@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"go-kafka-messaging/cmd/sender-app/app"
 	inputparser "go-kafka-messaging/internal/app/sender/input-parser"
@@ -33,10 +34,12 @@ func main() {
 
 		key := "key-" + strconv.Itoa(i)
 		topic := message.GetTopic()
+		jsonString, _ := json.Marshal(message.GetPayload())
+
 		kafkaMessage := kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 			Key:            []byte(key),
-			Value:          []byte(message.GetMessage()),
+			Value:          []byte(jsonString),
 		}
 		messageSender.Send(kafkaMessage)
 		i = i + 1
