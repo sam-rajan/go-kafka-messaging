@@ -43,6 +43,10 @@ func ParseMessage(input string) (*Message, error) {
 		data.Message = input
 	}
 
+	if receiver == "" && data.Message != "" {
+		return new(Message), errors.New("Message without recepient is not possible")
+	}
+
 	return &Message{topic: receiver, payload: data}, nil
 }
 
