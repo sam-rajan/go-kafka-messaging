@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"go-kafka-messaging/cmd/sender-app/app"
 	inputparser "go-kafka-messaging/internal/app/sender/input-parser"
+	configreader "go-kafka-messaging/internal/pkg/config-reader"
+	"log"
 	"os"
 	"strconv"
 
@@ -14,7 +16,14 @@ import (
 
 func main() {
 
-	messageSender := app.Init()
+	configFile := "configs/kafka-producer.properties"
+	kafkaProperties := configreader.KafkaProperties{}
+	kafkaProperties.LoadProperties(configFile)
+
+	if err := app.InitializeBroadcastTopic(kafkaProperties); err != nil {
+		log.Fatalln("Failed to initialize app")
+	}
+	messageSender := app.InitializeSender(&kafkaProperties)
 
 	scanner := bufio.NewScanner(os.Stdin)
 	var i int = 0
@@ -34,6 +43,10 @@ func main() {
 
 		key := "key-" + strconv.Itoa(i)
 		topic := message.GetTopic()
+
+		if topic == "" {
+
+		}
 		jsonString, _ := json.Marshal(message.GetPayload())
 
 		kafkaMessage := kafka.Message{
