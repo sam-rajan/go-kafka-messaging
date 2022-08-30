@@ -17,8 +17,8 @@ import (
 func main() {
 
 	configFile := "configs/kafka-producer.properties"
-	kafkaProperties := configreader.KafkaProperties{}
-	kafkaProperties.LoadProperties(configFile)
+	kafkaProperties := configreader.NewFileConfig(configFile)
+	configMap := kafkaProperties.ReadConfig()
 
 	if err := app.InitializeBroadcastTopic(kafkaProperties); err != nil {
 		log.Fatalln("Failed to initialize app")
