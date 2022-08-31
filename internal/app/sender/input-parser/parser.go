@@ -33,7 +33,7 @@ func ParseMessage(input string) (*Message, error) {
 	}
 
 	if err != nil {
-		return new(Message), errors.New(err.Error())
+		return new(Message), err
 	}
 
 	data := &Payload{}

@@ -2,20 +2,45 @@ package sender
 
 import (
 	"fmt"
-	"go-kafka-messaging/internal/app/sender/client"
+	"log"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-type MessageSender struct {
-	kafkaClient *client.KafkaClient
+type KafkaMessageSender struct {
+	instance *kafka.Producer
 }
 
-func NewMessageSender(client *client.KafkaClient) *MessageSender {
-	return &MessageSender{kafkaClient: client}
+func NewMessageSender(config kafka.ConfigMap) MessageSender {
+	producer, err := kafka.NewProducer(&config)
+
+	if err != nil {
+		log.Fatalf("Failed to create producer: %s\n", err)
+	}
+
+	sender := &KafkaMessageSender{instance: producer}
+	sender.initProducer()
+	return sender
 }
 
-func (self *MessageSender) Send(message kafka.Message) {
+func (self *KafkaMessageSender) initProducer() {
+	go func(producer *kafka.Producer) {
+		fmt.Println("Producer Callback started")
+		for event := range producer.Events() {
+			switch ev := event.(type) {
+			case *kafka.Message:
+				if ev.TopicPartition.Error != nil {
+					fmt.Printf("Failed to deliver message: Consumer Not Exist %s\n", *ev.TopicPartition.Topic)
+				} else {
+					fmt.Printf("Produced event to topic %s: key = %s value = %s\n",
+						*ev.TopicPartition.Topic, string(ev.Key), string(ev.Value))
+				}
+			}
+		}
+	}(self.instance)
+}
+
+func (self *KafkaMessageSender) Send(message kafka.Message) {
 	fmt.Println("Sending Message")
 
 	producer := self.kafkaClient.Get()
