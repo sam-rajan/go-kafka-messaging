@@ -4,21 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"go-kafka-messaging/internal/app/sender"
-	"go-kafka-messaging/internal/app/sender/client"
-	configreader "go-kafka-messaging/internal/pkg/config-reader"
 	topicmanager "go-kafka-messaging/internal/pkg/topic-manager"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-func InitializeSender(kafkaProperties *configreader.KafkaProperties) *sender.MessageSender {
-
-	kafkaClient := client.KafkaClient{}
-	kafkaClient.Init(kafkaProperties)
-
-	messageSender := sender.NewMessageSender(&kafkaClient)
+func InitializeSender(kafkaProperties kafka.ConfigMap) sender.MessageSender {
+	messageSender := sender.NewMessageSender(kafkaProperties)
 	return messageSender
 }
 
-func InitializeBroadcastTopic(kafkaProperties configreader.KafkaProperties) error {
+func InitializeBroadcastTopic(kafkaProperties kafka.ConfigMap) error {
 	topicCreator, err := topicmanager.NewTopicClient[topicmanager.TopicCreator](kafkaProperties)
 
 	if err != nil {

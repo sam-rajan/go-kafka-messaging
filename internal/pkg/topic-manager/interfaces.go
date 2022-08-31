@@ -1,8 +1,6 @@
 package topicmanager
 
 import (
-	configreader "go-kafka-messaging/internal/pkg/config-reader"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
@@ -14,9 +12,9 @@ type TopicCreator interface {
 	CreateTopic(topicName string) (string, error)
 }
 
-func NewTopicClient[T any](properties configreader.KafkaProperties) (T, error) {
-	delete(properties.Value, "auto.offset.reset")
-	client, err := kafka.NewAdminClient(&properties.Value)
+func NewTopicClient[T any](properties kafka.ConfigMap) (T, error) {
+	delete(properties, "auto.offset.reset")
+	client, err := kafka.NewAdminClient(&properties)
 
 	if err != nil {
 		var empty T
