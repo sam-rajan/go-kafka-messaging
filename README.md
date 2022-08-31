@@ -1,5 +1,5 @@
 # go-kafka-messaging
-A Sample GoLang application for learning purposes, understanding GoLang syntax and semantics. The application relies on Kafka for implementing messaging patterns. Please find the below sections to read more on the core functionalities of this application.
+A Sample GoLang application for learning purposes, understanding GoLang syntax and semantics. This application relies on Kafka for implementing messaging patterns. Please find the below sections to read more on the core functionalities of this application.
 
 ![](draw.png?raw=true)
 
