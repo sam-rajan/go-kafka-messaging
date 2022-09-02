@@ -28,8 +28,8 @@ func (self *InputHandler) OnInputRead(message string) {
 		return
 	}
 
-	key := "key-" + strconv.Itoa(i)
-	topic := message.GetTopic()
+	key := "key-" + strconv.Itoa(self.messageCount)
+	topic := message.re
 
 	if topic == "" {
 
