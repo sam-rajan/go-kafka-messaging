@@ -24,6 +24,10 @@ func NewMessageSender(config kafka.ConfigMap) MessageSender {
 }
 
 func (self *KafkaMessageSender) initProducer() {
+	if nil == self.instance {
+		panic("No Kafka producer instance found")
+	}
+
 	go func(producer *kafka.Producer) {
 		fmt.Println("Producer Callback started")
 		for event := range producer.Events() {
@@ -41,13 +45,11 @@ func (self *KafkaMessageSender) initProducer() {
 }
 
 func (self *KafkaMessageSender) Send(message kafka.Message) {
-	fmt.Println("Sending Message")
+	log.Println("Sending Message")
 
-	producer := self.kafkaClient.Get()
-
-	if nil == producer {
+	if nil == self.instance {
 		panic("No Kafka producer instance found")
 	}
 
-	producer.Produce(&message, nil)
+	self.instance.Produce(&message, nil)
 }

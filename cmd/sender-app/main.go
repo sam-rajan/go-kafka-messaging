@@ -2,6 +2,8 @@ package main
 
 import (
 	"go-kafka-messaging/cmd/sender-app/app"
+	"go-kafka-messaging/internal/app/sender"
+	"go-kafka-messaging/internal/app/sender/handler"
 	configreader "go-kafka-messaging/internal/pkg/config-reader"
 	"log"
 )
@@ -15,6 +17,9 @@ func main() {
 	if err := app.InitializeBroadcastTopic(configMap); err != nil {
 		log.Fatalln("Failed to initialize app")
 	}
-	messageSender := app.InitializeSender(configMap)
+	messageSender := sender.NewMessageSender(configMap)
 
+	inputListener := handler.NewMessageHandler(messageSender)
+	inputReader := app.NewInputReader()
+	inputReader.ReadMessage(inputListener)
 }
