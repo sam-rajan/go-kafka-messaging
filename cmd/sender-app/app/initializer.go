@@ -3,16 +3,10 @@ package app
 import (
 	"errors"
 	"fmt"
-	"go-kafka-messaging/internal/app/sender"
 	topicmanager "go-kafka-messaging/internal/pkg/topic-manager"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
-
-func InitializeSender(kafkaProperties kafka.ConfigMap) sender.MessageSender {
-	messageSender := sender.NewMessageSender(kafkaProperties)
-	return messageSender
-}
 
 func InitializeBroadcastTopic(kafkaProperties kafka.ConfigMap) error {
 	topicCreator, err := topicmanager.NewTopicClient[topicmanager.TopicCreator](kafkaProperties)
