@@ -1,7 +1,6 @@
 package sender
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -11,7 +10,7 @@ type KafkaMessageSender struct {
 	instance *kafka.Producer
 }
 
-func NewMessageSender(config kafka.ConfigMap) MessageSender {
+func NewMessageSender(config kafka.ConfigMap) *KafkaMessageSender {
 	producer, err := kafka.NewProducer(&config)
 
 	if err != nil {
@@ -29,14 +28,14 @@ func (self *KafkaMessageSender) initProducer() {
 	}
 
 	go func(producer *kafka.Producer) {
-		fmt.Println("Producer Callback started")
+		log.Println("Producer Callback started")
 		for event := range producer.Events() {
 			switch ev := event.(type) {
 			case *kafka.Message:
 				if ev.TopicPartition.Error != nil {
-					fmt.Printf("Failed to deliver message: Consumer Not Exist %s\n", *ev.TopicPartition.Topic)
+					log.Printf("Failed to deliver message: Consumer Not Exist %s\n", *ev.TopicPartition.Topic)
 				} else {
-					fmt.Printf("Produced event to topic %s: key = %s value = %s\n",
+					log.Printf("Produced event to topic %s: key = %s value = %s\n",
 						*ev.TopicPartition.Topic, string(ev.Key), string(ev.Value))
 				}
 			}

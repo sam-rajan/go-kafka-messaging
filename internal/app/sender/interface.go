@@ -1,15 +1,15 @@
 package sender
 
-import "github.com/confluentinc/confluent-kafka-go/kafka"
-
-type MessageSender interface {
-	Send(message kafka.Message)
-}
-
 type InputReader interface {
-	ReadMessage(listener ReaderListener)
+	ReadMessage()
 }
 
 type ReaderListener interface {
 	OnInputRead(message string)
+}
+
+type InputHandler func(string)
+
+func (f InputHandler) OnInputRead(message string) {
+	f(message)
 }

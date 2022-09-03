@@ -9,27 +9,19 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-type FileConfig struct {
-	configFile string
-}
+func ReadConfig(configFile string) kafka.ConfigMap {
 
-func NewFileConfig(config string) ConfigReader {
-	return &FileConfig{configFile: config}
-}
-
-func (self *FileConfig) ReadConfig() kafka.ConfigMap {
-
-	if self.configFile == "" {
+	if configFile == "" {
 		log.Fatal("Failed to config file")
 	}
 
-	configFile, err := os.Open(self.configFile)
+	config, err := os.Open(configFile)
 
 	if err != nil {
 		log.Fatalf("Failed to read config file %s", err)
 	}
 
-	scanner := bufio.NewScanner(configFile)
+	scanner := bufio.NewScanner(config)
 	configMap := make(map[string]kafka.ConfigValue)
 
 	for scanner.Scan() {

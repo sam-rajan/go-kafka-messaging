@@ -1,12 +1,7 @@
 package inputparser
 
-type Parser interface {
-	Parse(text string) (*Message, error)
-}
-
 const (
-	ACTION_COMMAND = "COMMAND"
-	ACTION_MESSAGE = "MESSAGE"
+	ACTION_MESSAGE = "TEXT"
 )
 
 var ACTIONS = [2]string{"EXIT", "HISTORY"}
