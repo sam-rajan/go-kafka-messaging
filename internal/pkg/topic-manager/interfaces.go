@@ -14,6 +14,7 @@ type TopicCreator interface {
 
 func NewTopicClient[T any](properties kafka.ConfigMap) (T, error) {
 	delete(properties, "auto.offset.reset")
+	delete(properties, "group.id")
 	client, err := kafka.NewAdminClient(&properties)
 
 	if err != nil {

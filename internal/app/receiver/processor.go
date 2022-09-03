@@ -1,21 +1,31 @@
 package receiver
 
 import (
-	"fmt"
+	"encoding/json"
+	"go-kafka-messaging/internal/app/receiver/client"
+	"go-kafka-messaging/internal/app/receiver/command"
+	inputparser "go-kafka-messaging/internal/pkg/input-parser"
+	"log"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-type KafkaProcessor struct {
-}
-
-func (self *KafkaProcessor) Process(channel <-chan kafka.Message) {
+func ProcessMessage(topic *client.KafkaTopic) {
 
 	go func(channel <-chan kafka.Message) {
 		for event := range channel {
-			fmt.Printf("Received message in %s consumer\n", *event.TopicPartition.Topic)
-			fmt.Printf("Received Key = %s, Value = %s\n ", string(event.Key), string(event.Value))
+			topic.MessageCount = topic.MessageCount + 1
+			message := &inputparser.Message{}
+			err := json.Unmarshal(event.Value, message)
+
+			if nil != err {
+				log.Printf("Failed unmarshling message. Reason : %s", err)
+				return
+			}
+
+			commandFn := command.GetCommand(message.Type)
+			commandFn(*message)
 		}
-	}(channel)
+	}(topic.Channel)
 
 }

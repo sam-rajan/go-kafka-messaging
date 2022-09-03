@@ -1,40 +1,46 @@
 package receiver
 
 import (
-	"fmt"
 	"go-kafka-messaging/internal/app/receiver/client"
-	"os"
+	"log"
+	"sync"
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 type MessageReceiver struct {
-	kafkaClient *client.KafkaClient
+	instance *kafka.Consumer
 }
 
-func NewMessageReceiver(client *client.KafkaClient) *MessageReceiver {
-	return &MessageReceiver{kafkaClient: client}
+func NewMessageReceiver(config kafka.ConfigMap) *MessageReceiver {
+	consumer, err := kafka.NewConsumer(&config)
+
+	if err != nil {
+		log.Fatalf("Failed to create consumer: %s\n", err)
+	}
+
+	return &MessageReceiver{instance: consumer}
 }
 
-func (self *MessageReceiver) StartReceive(topic string, channel chan<- kafka.Message) {
+func (self *MessageReceiver) StartReceive(topic *client.KafkaTopic, wg *sync.WaitGroup) {
 
-	consumer := self.kafkaClient.Get()
-
-	if nil == consumer {
+	if nil == self.instance {
 		panic("Client cannot be null")
 	}
 
+	topic.Channel = make(chan kafka.Message, 5)
+
 	broadcastTopic := "all"
-	err := consumer.SubscribeTopics([]string{topic, broadcastTopic}, nil)
+	err := self.instance.SubscribeTopics([]string{topic.Name, broadcastTopic}, nil)
 
 	if err != nil {
-		fmt.Printf("Failed to subscribt topic: %s\n", err)
-		os.Exit(1)
+		log.Fatalf("Failed to subscribt topic: %s\n", err)
 	}
 
 	go func(consumer *kafka.Consumer, channel chan<- kafka.Message) {
-		fmt.Println("Consumer Started")
+		log.Println("Consumer Started. Name: " + topic.Name)
+		wg.Add(1)
 		for {
 			event, err := consumer.ReadMessage(10 * time.Second)
 
@@ -45,6 +51,6 @@ func (self *MessageReceiver) StartReceive(topic string, channel chan<- kafka.Mes
 			channel <- *event
 
 		}
-	}(consumer, channel)
+	}(self.instance, topic.Channel)
 
 }
