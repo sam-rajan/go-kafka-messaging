@@ -6,14 +6,16 @@ import (
 	"os"
 )
 
-type ConsoleInputReader struct {
+type ConsoleInput struct {
+	listener       sender.ReaderListener
+	currentMessage string
 }
 
-func NewInputReader() sender.InputReader {
-	return &ConsoleInputReader{}
+func NewConsoleInputReader(inputListener sender.ReaderListener) sender.InputReader {
+	return &ConsoleInput{listener: inputListener}
 }
 
-func (self *ConsoleInputReader) ReadMessage(listener sender.ReaderListener) {
+func (self *ConsoleInput) ReadMessage() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 
@@ -23,8 +25,9 @@ func (self *ConsoleInputReader) ReadMessage(listener sender.ReaderListener) {
 			continue
 		}
 
-		if nil != listener {
-			listener.OnInputRead(value)
+		self.currentMessage = value
+		if nil != self.listener {
+			self.listener.OnInputRead(value)
 		}
 
 	}

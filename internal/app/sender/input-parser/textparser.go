@@ -5,14 +5,7 @@ import (
 	"strings"
 )
 
-type TextParser struct {
-}
-
-func NewParser() Parser {
-	return &TextParser{}
-}
-
-func (self *TextParser) Parse(input string) (*Message, error) {
+func Parse(input string) (*Message, error) {
 
 	receiver, err := "", error(nil)
 	if string(input[0]) == "@" {
@@ -24,14 +17,18 @@ func (self *TextParser) Parse(input string) (*Message, error) {
 	}
 
 	data := &Message{}
+
 	data.Type = ACTION_MESSAGE
 	if isAction(input) {
-		data.Type = ACTION_COMMAND
+		data.Type = input
 	}
 
 	if receiver == "" && data.Type == ACTION_MESSAGE {
 		return new(Message), errors.New("Message without recepient is not possible")
 	}
+
+	data.Receiver = receiver
+	data.Value = input
 
 	return data, nil
 }
