@@ -40,6 +40,8 @@ func (self *KafkaMessageSender) initProducer() {
 				}
 			}
 		}
+
+		defer producer.Close()
 	}(self.instance)
 }
 

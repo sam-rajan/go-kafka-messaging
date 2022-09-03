@@ -9,7 +9,7 @@ then
     go run cmd/sender-app/main.go
 elif [[ $APP == "RECEIVER" ]]
 then
-    CONSUMERS=$2
+    CONSUMERS=${2:-0}
     echo "Starting receiver application"
     go run cmd/receiver-app/main.go $CONSUMERS
 else 

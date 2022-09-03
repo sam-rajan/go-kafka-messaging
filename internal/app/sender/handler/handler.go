@@ -1,7 +1,7 @@
 package handler
 
 import (
-	inputparser "go-kafka-messaging/internal/app/sender/input-parser"
+	inputparser "go-kafka-messaging/internal/pkg/input-parser"
 	"log"
 )
 
