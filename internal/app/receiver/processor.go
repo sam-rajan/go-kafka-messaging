@@ -23,8 +23,14 @@ func ProcessMessage(topic *client.KafkaTopic) {
 				return
 			}
 
+			message.Receiver = topic.Name
 			commandFn := command.GetCommand(message.Type)
-			commandFn(*message)
+			if message.Type == command.EXIT {
+				commandFn(topic)
+			} else {
+				commandFn(*message)
+			}
+
 		}
 	}(topic.Channel)
 

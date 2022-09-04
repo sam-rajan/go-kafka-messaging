@@ -14,11 +14,12 @@ func OnInputRead(message string) {
 		return
 	}
 
-	command := GetCommand(parsedMessage.Type)
-
-	if nil == command {
-		log.Printf("Invalid command %s \n", parsedMessage.Value)
-		return
+	var command func(interface{})
+	if parsedMessage.Receiver == "" {
+		command = GetCommand(parsedMessage.Type)
+	} else {
+		command = sendMessage
 	}
+
 	command(*parsedMessage)
 }

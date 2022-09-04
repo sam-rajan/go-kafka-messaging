@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func sendMessage(input interface{}) {
+func printMessage(input interface{}) {
 
 	if nil == input {
 		log.Println("Invalid input")

@@ -11,6 +11,7 @@ type KafkaTopic struct {
 	Name         string
 	MessageCount int
 	Channel      chan kafka.Message
+	IsRunning    bool
 }
 
 func CreateTopic(groupId string) (*KafkaTopic, error) {
@@ -29,5 +30,5 @@ func CreateTopic(groupId string) (*KafkaTopic, error) {
 		return nil, err
 	}
 
-	return &KafkaTopic{Name: groupId}, nil
+	return &KafkaTopic{Name: groupId, IsRunning: true}, nil
 }
