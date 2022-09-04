@@ -38,19 +38,21 @@ func (self *MessageReceiver) StartReceive(topic *client.KafkaTopic, wg *sync.Wai
 		log.Fatalf("Failed to subscribt topic: %s\n", err)
 	}
 
-	go func(consumer *kafka.Consumer, channel chan<- kafka.Message) {
+	go func(consumer *kafka.Consumer, topic *client.KafkaTopic) {
 		log.Println("Consumer Started. Name: " + topic.Name)
 		wg.Add(1)
-		for {
+		for topic.IsRunning {
 			event, err := consumer.ReadMessage(10 * time.Second)
 
 			if err != nil {
 				continue
 			}
 
-			channel <- *event
+			topic.Channel <- *event
 
 		}
-	}(self.instance, topic.Channel)
+		close(topic.Channel)
+		wg.Done()
+	}(self.instance, topic)
 
 }

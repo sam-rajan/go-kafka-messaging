@@ -1,9 +1,5 @@
 package handler
 
-import (
-	"go-kafka-messaging/internal/pkg/shutdown"
-)
-
 const (
 	TEXT    = "TEXT"
 	HISTORY = "HISTORY"
@@ -18,6 +14,6 @@ func GetCommand(action string) func(input interface{}) {
 	case HISTORY:
 		return getHistory
 	case EXIT:
-		return shutdown.GracefulShutdown
+		return shutdown
 	}
 }

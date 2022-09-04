@@ -1,9 +1,5 @@
 package command
 
-import (
-	"go-kafka-messaging/internal/pkg/shutdown"
-)
-
 const (
 	TEXT    = "TEXT"
 	HISTORY = "HISTORY"
@@ -14,10 +10,10 @@ func GetCommand(action string) func(input interface{}) {
 
 	switch action {
 	default:
-		return sendMessage
+		return printMessage
 	case HISTORY:
 		return getHistory
 	case EXIT:
-		return shutdown.GracefulShutdown
+		return closeConsumer
 	}
 }
