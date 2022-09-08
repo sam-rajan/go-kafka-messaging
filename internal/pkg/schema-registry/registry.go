@@ -25,7 +25,7 @@ func CreateSchemaRegistry(config kafka.ConfigMap) *SchemaRegistry {
 		log.Fatal("Failed to create schema registry client")
 	}
 
-	password, err := config.Get("registry.pasword", "")
+	password, err := config.Get("registry.password", "")
 
 	if err != nil {
 		log.Fatal("Failed to create schema registry client")
@@ -35,4 +35,8 @@ func CreateSchemaRegistry(config kafka.ConfigMap) *SchemaRegistry {
 	schemaRegistryClient.SetCredentials(username.(string), password.(string))
 
 	return &SchemaRegistry{client: schemaRegistryClient}
+}
+
+func (self *SchemaRegistry) GetClient() *srclient.SchemaRegistryClient {
+	return self.client
 }

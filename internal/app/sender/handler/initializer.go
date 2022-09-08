@@ -4,6 +4,7 @@ import (
 	"errors"
 	"go-kafka-messaging/internal/app/sender"
 	configreader "go-kafka-messaging/internal/pkg/config-reader"
+	schemaregistry "go-kafka-messaging/internal/pkg/schema-registry"
 	topicmanager "go-kafka-messaging/internal/pkg/topic-manager"
 	"log"
 
@@ -17,11 +18,14 @@ func init() {
 	log.Println("Initializing Sender Handler")
 	configFile := "configs/kafka-producer.properties"
 	configMap := configreader.ReadConfig(configFile)
+	registryConfigFile := "configs/kafka-registry.properties"
+	registryConfigMap := configreader.ReadConfig(registryConfigFile)
 
 	if err := initializeBroadcastTopic(configMap); err != nil {
 		log.Fatalln("Failed to initialize app")
 	}
-	messageSender = sender.NewMessageSender(configMap)
+	registryClient := schemaregistry.CreateSchemaRegistry(registryConfigMap)
+	messageSender = sender.NewMessageSender(configMap, registryClient)
 }
 
 func initializeBroadcastTopic(kafkaProperties kafka.ConfigMap) error {
