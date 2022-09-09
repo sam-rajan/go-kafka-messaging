@@ -2,7 +2,6 @@ package sender
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	schemaregistry "go-kafka-messaging/internal/pkg/schema-registry"
 	"io/ioutil"
 	"log"
@@ -11,7 +10,7 @@ import (
 	"github.com/riferrei/srclient"
 )
 
-const SCHEMA string = "KafkaMessage"
+const SCHEMA string = "MessageSchema"
 
 type KafkaMessageSender struct {
 	instance       *kafka.Producer
@@ -53,7 +52,7 @@ func (self *KafkaMessageSender) initProducer() {
 	}(self.instance)
 }
 
-func (self *KafkaMessageSender) Send(reciever string, key string, message string) {
+func (self *KafkaMessageSender) Send(reciever string, key string, message []byte) {
 	log.Println("Sending Message")
 
 	if nil == self.instance {
@@ -62,7 +61,7 @@ func (self *KafkaMessageSender) Send(reciever string, key string, message string
 
 	schema, err := self.schemaRegistry.GetClient().GetLatestSchema(SCHEMA)
 	if schema == nil {
-		schemaBytes, _ := ioutil.ReadFile("complexType.avsc")
+		schemaBytes, _ := ioutil.ReadFile("assets/message.json")
 		schema, err = self.schemaRegistry.GetClient().CreateSchema(SCHEMA, string(schemaBytes), srclient.Json)
 		if err != nil {
 			log.Fatalf("Error creating the schema %s", err)
@@ -71,17 +70,13 @@ func (self *KafkaMessageSender) Send(reciever string, key string, message string
 
 	schemaIDBytes := make([]byte, 4)
 	binary.BigEndian.PutUint32(schemaIDBytes, uint32(schema.ID()))
-	valueBytes, _ := json.Marshal(message)
-
-	var recordValue []byte
-	recordValue = append(recordValue, byte(0))
-	recordValue = append(recordValue, schemaIDBytes...)
-	recordValue = append(recordValue, valueBytes...)
+	header := kafka.Header{Key: "schemaId", Value: schemaIDBytes}
 
 	kafkaMessage := kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &reciever, Partition: kafka.PartitionAny},
 		Key:            []byte(key),
-		Value:          recordValue,
+		Value:          message,
+		Headers:        []kafka.Header{header},
 	}
 	self.instance.Produce(&kafkaMessage, nil)
 }
