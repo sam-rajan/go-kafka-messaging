@@ -18,7 +18,7 @@ func sendMessage(input interface{}) {
 	jsonString, _ := json.Marshal(message)
 
 	key := strconv.Itoa(messageCounter)
-	messageSender.Send(message.Receiver, key, string(jsonString))
+	messageSender.Send(message.Receiver, key, jsonString)
 
 	messageCounter = messageCounter + 1
 }

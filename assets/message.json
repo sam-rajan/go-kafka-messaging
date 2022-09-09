@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "kafka-message-schema",
+    "title": "MessageSchema",
+    "type": "object",
+    "properties": {
+      "Type": {
+        "type": "string"
+      },
+      "Receiver": {
+        "type": "string"
+      },
+      "Value": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "Type",
+      "Receiver",
+      "Value"
+    ]
+  }
