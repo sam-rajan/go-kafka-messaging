@@ -1,5 +1,5 @@
 # go-kafka-messaging
-A Sample Kafka Producer-Consumer application written in GoLang for learning purpose, specifically for mastering GoLang. Please find the below sections to read more on the core functionalities of this application.
+A Sample Kafka Producer-Consumer application written in GoLang for learning purpose, specifically for understanding GoLang syntax and semantics. Please find the below sections to read more on the core functionalities of this application.
 
 ![](draw.png?raw=true)
 
@@ -7,6 +7,7 @@ A Sample Kafka Producer-Consumer application written in GoLang for learning purp
 
 * GoLang v1.18.5
 * Kafka Cluster
+* Schema Registry
 
 ## What are the basic functionalities of this application?
 * The Sender application receives input from the command line and sends the message to the receiver application via Kafka topics.
