@@ -14,18 +14,22 @@ import (
 var messageSender *sender.KafkaMessageSender
 var messageCounter = 0
 
-func init() {
+type InitParams struct {
+	ConfigFile         string
+	RegistryConfigFile string
+	DataFormat         string
+}
+
+func Init(initparams InitParams) {
 	log.Println("Initializing Sender Handler")
-	configFile := "configs/kafka-producer.properties"
-	configMap := configreader.ReadConfig(configFile)
-	registryConfigFile := "configs/kafka-registry.properties"
-	registryConfigMap := configreader.ReadConfig(registryConfigFile)
+	configMap := configreader.ReadConfig(initparams.ConfigFile)
+	registryConfigMap := configreader.ReadConfig(initparams.RegistryConfigFile)
 
 	if err := initializeBroadcastTopic(configMap); err != nil {
 		log.Fatalln("Failed to initialize app")
 	}
 	registryClient := schemaregistry.CreateSchemaRegistry(registryConfigMap)
-	messageSender = sender.NewMessageSender(configMap, registryClient)
+	messageSender = sender.NewMessageSender(configMap, registryClient, initparams.DataFormat)
 }
 
 func initializeBroadcastTopic(kafkaProperties kafka.ConfigMap) error {

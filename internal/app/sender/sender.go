@@ -15,16 +15,22 @@ const SCHEMA string = "MessageSchema"
 type KafkaMessageSender struct {
 	instance       *kafka.Producer
 	schemaRegistry *schemaregistry.SchemaRegistry
+	messageFormat  string
 }
 
-func NewMessageSender(config kafka.ConfigMap, registry *schemaregistry.SchemaRegistry) *KafkaMessageSender {
+func NewMessageSender(config kafka.ConfigMap,
+	registry *schemaregistry.SchemaRegistry, dataFormat string) *KafkaMessageSender {
 	producer, err := kafka.NewProducer(&config)
 
 	if err != nil {
 		log.Fatalf("Failed to create producer: %s\n", err)
 	}
 
-	sender := &KafkaMessageSender{instance: producer, schemaRegistry: registry}
+	sender := &KafkaMessageSender{
+		instance:       producer,
+		schemaRegistry: registry,
+		messageFormat:  dataFormat,
+	}
 	sender.initProducer()
 	return sender
 }
