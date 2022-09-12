@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "namespace": "schema.message",
+  "name": ""MessageSchema_JSON"
+  "fields": [
+    {
+      "name": "Type",
+      "type": "string"
+    },
+    {
+      "name": "Receiver",
+      "type": "string"
+    },
+    {
+      "name": "Value",
+      "type": "string"
+    }
+  ]
+}

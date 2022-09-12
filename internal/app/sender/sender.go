@@ -2,12 +2,11 @@ package sender
 
 import (
 	"encoding/binary"
+	"go-kafka-messaging/internal/app/sender/converter"
 	schemaregistry "go-kafka-messaging/internal/pkg/schema-registry"
-	"io/ioutil"
 	"log"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/riferrei/srclient"
 )
 
 const SCHEMA string = "MessageSchema"
@@ -65,24 +64,20 @@ func (self *KafkaMessageSender) Send(reciever string, key string, message []byte
 		panic("No Kafka producer instance found")
 	}
 
-	schema, err := self.schemaRegistry.GetClient().GetLatestSchema(SCHEMA)
-	if schema == nil {
-		schemaBytes, _ := ioutil.ReadFile("assets/message.json")
-		schema, err = self.schemaRegistry.GetClient().CreateSchema(SCHEMA, string(schemaBytes), srclient.Json)
-		if err != nil {
-			log.Fatalf("Error creating the schema %s", err)
-		}
-	}
+	dataConverter := converter.GetDataConverter(self.messageFormat, self.schemaRegistry)
+	schemaName := SCHEMA + "_" + self.messageFormat
+	convertedMessage, schemaId := dataConverter.Convert(message, schemaName)
 
 	schemaIDBytes := make([]byte, 4)
-	binary.BigEndian.PutUint32(schemaIDBytes, uint32(schema.ID()))
-	header := kafka.Header{Key: "schemaId", Value: schemaIDBytes}
+	binary.BigEndian.PutUint32(schemaIDBytes, uint32(schemaId))
+	schemaIdHeader := kafka.Header{Key: "schemaId", Value: schemaIDBytes}
+	dataFormatHeader := kafka.Header{Key: "dataFormat", Value: []byte(self.messageFormat)}
 
 	kafkaMessage := kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &reciever, Partition: kafka.PartitionAny},
 		Key:            []byte(key),
-		Value:          message,
-		Headers:        []kafka.Header{header},
+		Value:          convertedMessage,
+		Headers:        []kafka.Header{schemaIdHeader, dataFormatHeader},
 	}
 	self.instance.Produce(&kafkaMessage, nil)
 }
