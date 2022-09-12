@@ -1,6 +1,7 @@
 package converter
 
 import (
+	inputparser "go-kafka-messaging/internal/pkg/input-parser"
 	schemaregistry "go-kafka-messaging/internal/pkg/schema-registry"
 )
 
@@ -11,7 +12,7 @@ const (
 )
 
 type DataConverter interface {
-	Convert(message []byte, schemaName string) ([]byte, int)
+	Convert(message []byte, schemaId uint32) (*inputparser.Message, error)
 }
 
 func GetDataConverter(dataFormat string, registry *schemaregistry.SchemaRegistry) DataConverter {

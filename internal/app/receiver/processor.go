@@ -2,10 +2,9 @@ package receiver
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	"go-kafka-messaging/internal/app/receiver/client"
 	"go-kafka-messaging/internal/app/receiver/command"
-	inputparser "go-kafka-messaging/internal/pkg/input-parser"
+	"go-kafka-messaging/internal/app/receiver/converter"
 	schemaregistry "go-kafka-messaging/internal/pkg/schema-registry"
 	"log"
 
@@ -18,38 +17,28 @@ func ProcessMessage(topic *client.KafkaTopic, schemaRegistry *schemaregistry.Sch
 		for event := range channel {
 			topic.MessageCount = topic.MessageCount + 1
 
-			if len(event.Headers) == 0 {
-				log.Println("Invalid message. Schema ID header missing")
+			schemaId, dataFormat := uint32(0), ""
+			for _, header := range event.Headers {
+				switch header.Key {
+				case "schemaId":
+					schemaId = binary.BigEndian.Uint32(header.Value)
+				case "dataFormat":
+					dataFormat = string(header.Value)
+				}
+			}
+
+			if schemaId == 0 || dataFormat == "" {
+				log.Printf("Missing headers, cannot parse message")
 				continue
 			}
-			schemaId := binary.BigEndian.Uint32(event.Headers[0].Value)
-			schema, err := schemaRegistry.GetClient().GetSchema(int(schemaId))
+
+			dataConverter := converter.GetDataConverter(dataFormat, schemaRegistry)
+			message, err := dataConverter.Convert(event.Value, schemaId)
+
 			if err != nil {
-				log.Fatalf("Error getting the schema with id '%d' %s", schemaId, err)
-			}
-
-			var jsonType interface{}
-			if err := json.Unmarshal(event.Value, &jsonType); err != nil {
-				log.Printf("Failed to unmarshall Error: %v \n", err)
 				continue
 			}
 
-			jsonSchema := schema.JsonSchema()
-			if err = jsonSchema.Validate(jsonType); err != nil {
-				log.Printf("%v", err)
-				continue
-			}
-
-			if nil != err {
-				log.Printf("Failed unmarshling message. Reason : %s", err)
-				return
-			}
-
-			message := &inputparser.Message{}
-			if err := json.Unmarshal(event.Value, message); err != nil {
-				log.Printf("Failed to unmarshall to Message struct Error: %v \n", err)
-				continue
-			}
 			message.Receiver = topic.Name
 			commandFn := command.GetCommand(message.Type)
 			if message.Type == command.EXIT {
