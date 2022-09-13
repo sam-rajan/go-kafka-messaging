@@ -1,7 +1,7 @@
 {
   "type": "record",
   "namespace": "schema.message",
-  "name": ""MessageSchema_JSON"
+  "name": "MessageSchema_JSON",
   "fields": [
     {
       "name": "Type",
