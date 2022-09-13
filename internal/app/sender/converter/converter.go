@@ -6,7 +6,7 @@ import (
 
 const (
 	JSON     string = "JSON"
-	AVRO     string = "AVARO"
+	AVRO     string = "AVRO"
 	PROTOBUF string = "PROTO"
 )
 
@@ -20,7 +20,7 @@ func GetDataConverter(dataFormat string, registry *schemaregistry.SchemaRegistry
 	case JSON:
 		return NewJsonDataFormat(registry)
 	case AVRO:
-		return NewAvaroDataFormat(registry)
+		return NewAvroDataFormat(registry)
 	default:
 		return NewJsonDataFormat(registry)
 	}

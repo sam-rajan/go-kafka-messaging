@@ -6,7 +6,7 @@ cd "$(dirname "${0}")/.."
 if [[ $APP == "SENDER" ]]
 then
     echo "Starting sender application"
-    go run cmd/sender-app/main.go
+    go run cmd/sender-app/main.go $2
 elif [[ $APP == "RECEIVER" ]]
 then
     CONSUMERS=${2:-0}
