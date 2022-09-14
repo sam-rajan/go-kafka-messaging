@@ -12,7 +12,7 @@ type AvroDataFormat struct {
 	registry *schemaregistry.SchemaRegistry
 }
 
-func NewAvaroDataFormat(schemaRegistry *schemaregistry.SchemaRegistry) *AvroDataFormat {
+func NewAvroDataFormat(schemaRegistry *schemaregistry.SchemaRegistry) *AvroDataFormat {
 	return &AvroDataFormat{registry: schemaRegistry}
 }
 

@@ -21,7 +21,7 @@ func GetDataConverter(dataFormat string, registry *schemaregistry.SchemaRegistry
 	case JSON:
 		return NewJsonDataFormat(registry)
 	case AVRO:
-		return NewAvaroDataFormat(registry)
+		return NewAvroDataFormat(registry)
 	default:
 		return NewJsonDataFormat(registry)
 	}
