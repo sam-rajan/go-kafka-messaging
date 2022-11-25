@@ -1,5 +1,5 @@
 # go-kafka-messaging
-Sample GoLang application which produces messages to and consumes from an Apache Kafka Cluster. And this sort of 'get your hands dirty' project or a project for getting myself acquainted with Golang and hence learning the basic and advanced features of Go Programming Language.  Please find the below sections to read more on the core functionalities of this application.
+Sample GoLang application which produces messages to and consumes from an Apache Kafka Cluster. And this is a sort of 'get your hands dirty' project or a project for getting myself acquainted with Golang and hence learning the basic and advanced features of Go Programming Language.  Please find the below sections to read more on the core functionalities of this application.
 
 ![](draw.png?raw=true)
 
